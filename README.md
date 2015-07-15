@@ -25,16 +25,23 @@ comming soon...
 
 ### Manually
 Just drop the following libraries in your bin folder:
- * vv
+ * NLog.Targets.WebsocketServer
+ * vtortola.WebSocketListener
+ * vtortola.WebSocketListener.Rfc6455
+ * Newtonsoft.Json
+ * System.Threading.Tasks.Dataflow
 
 ## Configuration
 Configure `NLog.Targets.WebsocketServer` as a new target.
-Required configuration parameters:
+#### Required configuration parameters:
  * `port´: Indicates in which connection will the WebSocket server listen for new connections.
+
+#### Optional configuation parameters:
+ * `IPAddressStartsWith`: Indicates how the client IP address must start to be accepted. Loopback interface is always accepted. A example value would be `192.168.`. An empty string means that all connections are accepted.
 
 ```xml
   <nlog>
-    <!-- This part is only required fro NLog versions < 4.0  -->
+    <!-- This part is only required for NLog versions < 4.0  -->
     <extensions>
       <add assembly="NLog.Targets.WebsocketServer"/>
     </extensions>
