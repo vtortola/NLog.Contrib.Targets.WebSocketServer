@@ -1,8 +1,18 @@
-# NLog.Targets.WebSocket
+# NLog.Targets.WebSocketServer
 
 NLog target that setups a standalone WebSocket server and broadcasts the log entries.
 
+Checkout this example of a log viewer done in AngularJS. 
+
 ## Installation
+
+## Configuration
+
+### NuGet
+
+### Manually
+Just drop the following libraries in your bin folder:
+ * vv
 
 ```xml
   <nlog>
@@ -23,8 +33,6 @@ NLog target that setups a standalone WebSocket server and broadcasts the log ent
     </rules>
   </nlog>
 ```
-
-## Configuration
 
 ### Links
  * [Extending NLog](//github.com/nlog/nlog/wiki/Extending%20NLog)
