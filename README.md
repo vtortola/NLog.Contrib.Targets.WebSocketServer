@@ -1,6 +1,6 @@
 # NLog.Targets.WebSocketServer
 
-Watch your log from multiple servers in real-time with minimal effort. Merge log outputs from multiple servers in real subscribe to a regular expression and focus in what matters.
+Watch your servers´ logs in real-time with minimal effort. Subscribe to a regular expression and focus in what matters.
 
 NLog.Targets.WebSocketServer is a [NLog target](https://github.com/nlog/nlog/wiki/Targets) that instead of writing on a file, or showing the log on the console, broadcast the log entries through websockets, so web clients can watch the log in real-time.
 
