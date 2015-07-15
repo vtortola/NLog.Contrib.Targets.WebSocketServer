@@ -1,0 +1,23 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>NLog.Targets.WebSocketServer example</title>
+    <link href="styles/ng-websocket-log-viewer-1.0.0.css" rel="stylesheet" />
+    <link href="styles/web-viewer.css" rel="stylesheet" />
+    <link rel="shortcut icon" href="//angularjs.org/favicon.ico" type="image/x-icon">
+</head>
+<body ng-app="nglog-websockeet-demo">
+
+    <div id="header" ng-controller="headerController">
+        <label>Number of lines</label><input type="number" ng-model="numberOfLines" ng-model-options="{ debounce: 500 }" ng-change="setLineCount(numberOfLines)" />
+        <label>Add source</label><input type="text" ng-model="newSource" /><input type="color" ng-model="newSoureColor" /><button ng-click="addSource(newSource, newSoureColor)">Add</button>
+        <label>Filter Regex</label><input type="text" ng-model="filterExpression" ng-model-options="{ debounce: 500 }" ng-change="filter(filterExpression)" />
+    </div>
+
+    <websocket-log-viewer></websocket-log-viewer>
+
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
+    <script src="scripts/ng-websocket-log-viewer-1.0.0.js"></script>
+    <script src="scripts/web-viewer.js"></script>
+</body>
+</html>

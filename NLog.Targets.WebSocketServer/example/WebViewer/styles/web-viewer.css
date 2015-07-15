@@ -1,0 +1,45 @@
+﻿*{
+    margin:0;
+    padding:0;
+}
+
+body {
+    background-color:#222;
+    color:#fff;
+    font-family:'Segoe UI';
+}
+
+label{
+    margin-left:30px;
+}
+
+input{
+    border:1px solid #444;
+    border-radius:4px;
+    margin:0 5px 0 5px;
+    line-height:20px;
+}
+
+input[type=number]{
+    width:50px;
+    text-align:center;
+}
+
+input[type=text]{
+    width:400px;
+}
+
+button{
+    padding:5px 10px;
+    border-radius:3px;
+}
+
+#header{
+    border-bottom:1px solid #444;
+    padding:5px;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    background-color:#111;
+}

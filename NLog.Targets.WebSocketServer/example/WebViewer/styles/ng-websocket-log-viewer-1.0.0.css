@@ -1,0 +1,11 @@
+.log-viewer{
+    font-family:'Courier New';
+    font-size:.9em;
+    margin:50px 10px 10px 10px;
+    padding-bottom:20px;
+    letter-spacing:1px;
+}
+
+.log-viewer-logentry{
+    white-space:nowrap;
+}
