@@ -59,7 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LogEntryDistributor.cs" />
-    <Compile Include="FilteredWebSocket.cs" />
+    <Compile Include="WebSocketWrapper.cs" />
     <Compile Include="LogEntry.cs" />
     <Compile Include="WebSocketServerTarget.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

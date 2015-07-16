@@ -16,14 +16,17 @@ using vtortola.WebSockets;
 namespace NLog.Targets.WebSocketServer
 {
 
-    internal sealed class LogEntryDistributor : IDisposable
+    public sealed class LogEntryDistributor : IDisposable
     {
         readonly BufferBlock<LogEntry> _block;
         readonly CancellationTokenSource _cancel;
+        readonly ReaderWriterLockSlim _semaphore;
         readonly WebSocketListener _listener;
-        readonly ConcurrentDictionary<Guid, FilteredWebSocket> _connections;
+        readonly List<WebSocketWrapper> _connections;
         readonly JsonSerializer _serializer;
         readonly String _ipAddressStart;
+
+        Int32 _disposed;
 
         public LogEntryDistributor(Int32 port, String ipAddressStart)
         {
@@ -32,8 +35,9 @@ namespace NLog.Targets.WebSocketServer
             _listener.Standards.RegisterStandard(new vtortola.WebSockets.Rfc6455.WebSocketFactoryRfc6455());
             _cancel = new CancellationTokenSource();
             _block = new BufferBlock<LogEntry>(new DataflowBlockOptions() { CancellationToken = _cancel.Token });
-            _connections = new ConcurrentDictionary<Guid, FilteredWebSocket>();
+            _connections = new List<WebSocketWrapper>();
             _serializer = new JsonSerializer();
+            _semaphore = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
             _listener.Start();
             Task.Run((Func<Task>)AcceptConnections);
             Task.Run((Func<Task>)ReceiveAndBroadcast);
@@ -47,13 +51,11 @@ namespace NLog.Targets.WebSocketServer
 
                 if (!CanAcceptConnection(con))
                 {
-                    Task.Run(()=> con.Dispose());
+                    DisconnectWebSocket(con);
                     continue;
                 }
 
-                var ws = new FilteredWebSocket(con);
-                Task.Run(() => AcceptWebSocketCommands(ws));
-                _connections.TryAdd(Guid.NewGuid(), ws);
+                AddWebSocketToPool(con);
             }
         }
 
@@ -68,95 +70,190 @@ namespace NLog.Targets.WebSocketServer
             return con.RemoteEndpoint.Address.ToString().StartsWith(_ipAddressStart);
         }
 
-        private async Task AcceptWebSocketCommands(FilteredWebSocket wsWrapper)
+        private void AddWebSocketToPool(WebSocket con)
         {
-            while (wsWrapper.WebSocket.IsConnected && !_cancel.IsCancellationRequested)
+            var ws = new WebSocketWrapper(con);
+            try
             {
-                var message = await wsWrapper.WebSocket.ReadStringAsync(_cancel.Token).ConfigureAwait(false);
-
-                if (message == null)
-                    continue;
-
-                var json = JObject.Parse(message);
-                var command = json.Property("command");
-                if (command == null || command.Value == null)
-                    continue;
-                try
-                {
-                    switch (command.Value.ToString())
-                    {
-                        case "filter":
-                            var expression = json.Property("filter");
-                            if (expression == null || expression.Value == null)
-                                continue;
-                            wsWrapper.Expression = new Regex(expression.Value.ToString(), RegexOptions.Compiled);
-                            break;
-                    }
-                }
-                catch { }
+                _semaphore.EnterWriteLock();
+                _connections.Add(ws);
             }
+            finally
+            {
+                _semaphore.ExitWriteLock();
+            }
+
+            Task.Run(() => AcceptWebSocketCommands(ws));
         }
 
+        private static void DisconnectWebSocket(WebSocket con)
+        {
+            Task.Run(() => con.Dispose());
+        }
+              
         private async Task ReceiveAndBroadcast()
         {
             while (!_cancel.IsCancellationRequested)
             {
                 var message = await _block.ReceiveAsync(_cancel.Token).ConfigureAwait(false);
                 RemoveDisconnected();
-                ParallelBroadcast(message);
+                ParallelBroadcastLogEntry(message);
             }
         }
 
-        private void ParallelBroadcast(LogEntry logEntry)
+        private Int64 GetTimestamp(DateTime dateTime)
         {
-            Parallel.ForEach(_connections.Values, new ParallelOptions() { CancellationToken = _cancel.Token, MaxDegreeOfParallelism = 5 },
-            con =>
+            return Int64.Parse(dateTime.ToString("yyyyMMddHHmmssff"));
+        }
+
+        public void Publish(String logline, DateTime timestamp)
+        {
+            if (_listener.IsStarted && !_cancel.IsCancellationRequested)
+            {
+                _block.Post(new LogEntry(GetTimestamp(timestamp), logline));
+            }
+        }
+
+        private void ParallelBroadcastLogEntry(LogEntry logEntry)
+        {
+            try
+            {
+                _semaphore.EnterReadLock();
+                Parallel.ForEach(
+                    source: _connections,
+                    parallelOptions: new ParallelOptions()
+                    {
+                        CancellationToken = _cancel.Token,
+                        MaxDegreeOfParallelism = Environment.ProcessorCount * 2
+                    },
+                    body: ws => SendLogEntry(ws, logEntry));
+            }
+            finally
+            {
+                _semaphore.ExitReadLock();
+            }
+        }
+
+        private void SendLogEntry(WebSocketWrapper ws, LogEntry logEntry)
+        {
+            try
+            {
+                if (!ws.WebSocket.IsConnected)
+                    return;
+
+                if (ws.Expression != null && !ws.Expression.IsMatch(logEntry.Line))
+                    return;
+
+                using (var wsmsg = ws.WebSocket.CreateMessageWriter(WebSocketMessageType.Text))
+                using (var writer = new StreamWriter(wsmsg, Encoding.UTF8, 1024, true))
+                {
+                    _serializer.Serialize(writer, logEntry);
+                }
+            }
+            catch
+            {
+                DisconnectWebSocket(ws.WebSocket);
+            }
+        }
+
+        private async Task AcceptWebSocketCommands(WebSocketWrapper ws)
+        {
+            while (ws.WebSocket.IsConnected && !_cancel.IsCancellationRequested)
             {
                 try
                 {
-                    if (!con.WebSocket.IsConnected)
-                        return;
+                    var message = await ws.WebSocket.ReadStringAsync(_cancel.Token).ConfigureAwait(false);
 
-                    if (con.Expression != null && !con.Expression.IsMatch(logEntry.Line))
-                        return;
+                    if (message == null) // server shutting down
+                        continue; 
 
-                    using (var wsmsg = con.WebSocket.CreateMessageWriter(WebSocketMessageType.Text))
-                    using (var writer = new StreamWriter(wsmsg, Encoding.UTF8, 1024, true))
-                    {
-                        _serializer.Serialize(writer, logEntry);
-                    }
+                    var json = JObject.Parse(message);
+                    var command = json.Property("command");
+                    if (command == null || command.Value == null)
+                        continue;
+
+                    HandleCommand(command.Value.ToString(), json, ws);
                 }
                 catch
                 {
-                    con.WebSocket.Close();
+                    DisconnectWebSocket(ws.WebSocket);
                 }
-            });
+            }
+        }
+
+        private void HandleCommand(String commandName, JObject json, WebSocketWrapper wsWrapper)
+        {
+            try
+            {
+                switch (commandName)
+                {
+                    case "filter":
+                        var expression = json.Property("filter");
+                        if (expression == null || expression.Value == null)
+                            return;
+                        wsWrapper.Expression = new Regex(expression.Value.ToString());
+                        break;
+                }
+            }
+            catch { }
         }
 
         private void RemoveDisconnected()
         {
-            var disconnected = _connections.Where(c => !c.Value.WebSocket.IsConnected).Select(w => w.Key).ToList();
-            FilteredWebSocket ws = null;
-
-            if (!disconnected.Any())
-                return;
-
-            foreach (var d in disconnected)
+            try
             {
-                _connections.TryRemove(d, out ws);
-                ws.WebSocket.Dispose();
+                _semaphore.EnterUpgradeableReadLock();
+
+                var disconnected = _connections.Where(c => !c.WebSocket.IsConnected).ToList();
+                if (!disconnected.Any())
+                    return;
+
+                RemoveDisconnected(disconnected);
+            }
+            finally
+            {
+                _semaphore.ExitUpgradeableReadLock();
             }
         }
 
-        internal void Publish(String logline, DateTime timestamp)
+        private void RemoveDisconnected(List<WebSocketWrapper> disconnected)
         {
-            _block.Post(new LogEntry(Int64.Parse(timestamp.ToString("yyyyMMddhhmmssffff")), logline));
+            try
+            {
+                _semaphore.EnterWriteLock();
+                foreach (var d in disconnected)
+                {
+                    _connections.Remove(d);
+                    d.WebSocket.Dispose();
+                }
+            }
+            finally
+            {
+                _semaphore.ExitWriteLock();
+            }
+        }
+
+        private void Dispose(Boolean disposing)
+        {
+            if (Interlocked.CompareExchange(ref _disposed, 1, 0) == 1)
+                return;
+
+            if(disposing)
+                GC.SuppressFinalize(this);
+
+            _cancel.Cancel();
+            _semaphore.Dispose();
+            _listener.Dispose();
         }
 
         public void Dispose()
         {
-            _cancel.Cancel();
-            _listener.Dispose();
+            Dispose(true);
+        }
+
+        ~LogEntryDistributor()
+        {
+            Dispose(false);
         }
     }
 

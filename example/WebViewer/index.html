@@ -14,7 +14,10 @@
         <label>Filter Regex</label><input type="text" ng-model="filterExpression" ng-model-options="{ debounce: 500 }" ng-change="filter(filterExpression)" />
     </div>
 
-    <websocket-log-viewer></websocket-log-viewer>
+    <div id="log-container">
+        <websocket-log-viewer></websocket-log-viewer>
+    </div>
+    
 
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
     <script src="scripts/ng-websocket-log-viewer-1.0.0.js"></script>

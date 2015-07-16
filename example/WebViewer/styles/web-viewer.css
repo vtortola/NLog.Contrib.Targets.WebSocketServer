@@ -42,4 +42,9 @@ button{
     left:0;
     width:100%;
     background-color:#111;
+    white-space:nowrap;
+}
+
+#log-container{
+    margin-top:60px;
 }
