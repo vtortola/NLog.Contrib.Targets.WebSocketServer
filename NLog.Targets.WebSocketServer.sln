@@ -13,8 +13,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ng-websocket-log-viewer", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "example", "example", "{C8A5C1B2-CD55-4B68-883C-9AD0CFC31AE5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication", "ConsoleApplication\ConsoleApplication.csproj", "{B636421E-E445-400D-B58E-EBE68411E964}"
-EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "WebViewer", "http://localhost:45827", "{3DF51BF5-BE51-4491-864F-B1C184218D33}"
 	ProjectSection(WebsiteProperties) = preProject
 		UseIISExpress = "true"
@@ -37,6 +35,15 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "WebViewer", "http://localho
 		DefaultWebSiteLanguage = "Visual C#"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication", "example\ConsoleApplication\ConsoleApplication.csproj", "{B636421E-E445-400D-B58E-EBE68411E964}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{98F2CC5D-3B99-433D-A03E-9F22E00692FC}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,20 +54,20 @@ Global
 		{8CA5D50A-CAC7-4FB0-B811-2A1A0DF6ACDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CA5D50A-CAC7-4FB0-B811-2A1A0DF6ACDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CA5D50A-CAC7-4FB0-B811-2A1A0DF6ACDF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B636421E-E445-400D-B58E-EBE68411E964}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B636421E-E445-400D-B58E-EBE68411E964}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B636421E-E445-400D-B58E-EBE68411E964}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B636421E-E445-400D-B58E-EBE68411E964}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3DF51BF5-BE51-4491-864F-B1C184218D33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3DF51BF5-BE51-4491-864F-B1C184218D33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DF51BF5-BE51-4491-864F-B1C184218D33}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{3DF51BF5-BE51-4491-864F-B1C184218D33}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{B636421E-E445-400D-B58E-EBE68411E964}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B636421E-E445-400D-B58E-EBE68411E964}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B636421E-E445-400D-B58E-EBE68411E964}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B636421E-E445-400D-B58E-EBE68411E964}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{B636421E-E445-400D-B58E-EBE68411E964} = {C8A5C1B2-CD55-4B68-883C-9AD0CFC31AE5}
 		{3DF51BF5-BE51-4491-864F-B1C184218D33} = {C8A5C1B2-CD55-4B68-883C-9AD0CFC31AE5}
+		{B636421E-E445-400D-B58E-EBE68411E964} = {C8A5C1B2-CD55-4B68-883C-9AD0CFC31AE5}
 	EndGlobalSection
 EndGlobal
