@@ -9,7 +9,7 @@ angular.module("ng-websocket-log-viewer", [])
     var lastTimespan = 0;
 
     $scope.$on('websocket-log-viewer-add-source', function (event, args) {
-        connect('ws://127.0.0.1:9001', args[1], 1);
+        connect(args[0], args[1], 1);
     });
         
     $scope.$on('websocket-log-viewer-filter', function (event, args) {
@@ -58,7 +58,7 @@ angular.module("ng-websocket-log-viewer", [])
         while ($scope.loglines.length > maxLines)
             $scope.loglines.shift()
 
-        $scope.$apply();
+        $scope.$$phase || $scope.$apply();
         window.scrollTo(0, document.body.scrollHeight);
     };
 

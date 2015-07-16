@@ -26,7 +26,8 @@ input[type=number]{
 }
 
 input[type=text]{
-    width:400px;
+    width:200px;
+    padding-left:10px;
 }
 
 button{
@@ -43,6 +44,14 @@ button{
     width:100%;
     background-color:#111;
     white-space:nowrap;
+}
+
+#add-source{
+    width:200px;
+}
+
+#regex{
+    width:100px;
 }
 
 #log-container{

@@ -10,8 +10,8 @@
 
     <div id="header" ng-controller="headerController">
         <label>Number of lines</label><input type="number" ng-model="numberOfLines" ng-model-options="{ debounce: 500 }" ng-change="setLineCount(numberOfLines)" />
-        <label>Add source</label><input type="text" ng-model="newSource" /><input type="color" ng-model="newSoureColor" /><button ng-click="addSource(newSource, newSoureColor)">Add</button>
-        <label>Filter Regex</label><input type="text" ng-model="filterExpression" ng-model-options="{ debounce: 500 }" ng-change="filter(filterExpression)" />
+        <label>Add source</label><input id="add-source" expand-on-focus="400" type="text" ng-model="newSource" /><input type="color" ng-model="newSoureColor" /><button ng-click="addSource(newSource, newSoureColor)">Add</button>
+        <label>Filter Regex</label><input id="regex" expand-on-focus="200" type="text" ng-model="filterExpression" ng-model-options="{ debounce: 500 }" ng-change="filter(filterExpression)" />
     </div>
 
     <div id="log-container">
