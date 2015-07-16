@@ -22,6 +22,33 @@ angular.module("ng-websocket-log-viewer", [])
         maxLines = Number(args[0]);
     });
 
+    $scope.$on('websocket-log-viewer-pause', function (event) {
+        pause();
+    });
+
+    var paused = false;
+    var cache = [];
+    var pause = function () {
+        if (paused) {
+            for (var i = 0; i < cache.length; i++) {
+                $scope.loglines.push(cache[i]);
+            }
+            cache = [];
+            updateLogBoard();
+        }
+        paused = !paused;
+    };
+
+    var saveEntry = function (entry) {
+        if (paused) {
+            cache.push(entry);
+        }
+        else {
+            $scope.loglines.push(entry);
+            updateLogBoard();
+        }
+    }
+
     var connect = function (url, color, retry) {
  
         var ws = new WebSocket(url);
@@ -30,10 +57,8 @@ angular.module("ng-websocket-log-viewer", [])
 
             var entry = JSON.parse(msg.data);
             entry.color = color;
-            $scope.loglines.push(entry);
+            saveEntry(entry);
             lastTimespan = entry.Timestamp;
-
-            updateLogBoard();
         }
         servers.push(ws);
 
@@ -63,12 +88,11 @@ angular.module("ng-websocket-log-viewer", [])
     };
 
     var showMessage = function (line, color) {
-        $scope.loglines.push({
+        saveEntry({
             Timestamp: lastTimespan++,
             Line: line,
             color: color
         });
-        updateLogBoard();
     };
 
     var connectionRetry = function (url, color, retry) {
@@ -109,10 +133,7 @@ angular.module("ng-websocket-log-viewer", [])
         restrict: 'E',
         replace: true,
         template: '<div class="log-viewer"><div class="log-viewer-entry" ng-repeat="logline in loglines" ng-style="{ color: logline.color}">{{logline.Line}}</div></div>',
-        controller: 'websocketLogViewerController',
-        link: function (scope, elem, attrs) {
-            
-        }
+        controller: 'websocketLogViewerController'
     };
 })
 

@@ -1,8 +1,4 @@
-﻿*{
-    margin:0;
-    padding:0;
-}
-
+﻿
 body {
     background-color:#222;
     color:#fff;
@@ -37,13 +33,13 @@ button{
 }
 
 #header{
-    border-bottom:1px solid #444;
+    border-bottom:1px solid #AAA;
     padding:5px;
     position:fixed;
     top:0;
     left:0;
     width:100%;
-    background-color:#111;
+    background-color:#333;
     white-space:nowrap;
 }
 
@@ -57,4 +53,17 @@ button{
 
 #log-container{
     margin-top:60px;
+}
+
+.blink{
+    animation-name: blinker;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+@keyframes blinker {  
+    0% { opacity: .3; }
+    50% { opacity:.7;}
+    100% { opacity: 1.0; }
 }

@@ -10,15 +10,13 @@
 
     <div id="header" ng-controller="headerController">
         <label>Number of lines</label><input type="number" ng-model="numberOfLines" ng-model-options="{ debounce: 500 }" ng-change="setLineCount(numberOfLines)" />
+        <button ng-click="pause()" ng-class="{blink : paused}">Pause</button>
         <label>Add source</label><input id="add-source" expand-on-focus="400" type="text" ng-model="newSource" /><input type="color" ng-model="newSoureColor" /><button ng-click="addSource(newSource, newSoureColor)">Add</button>
         <label>Filter Regex</label><input id="regex" expand-on-focus="200" type="text" ng-model="filterExpression" ng-model-options="{ debounce: 500 }" ng-change="filter(filterExpression)" />
     </div>
 
-    <div id="log-container">
-        <websocket-log-viewer></websocket-log-viewer>
-    </div>
+    <websocket-log-viewer id="log-container"></websocket-log-viewer>
     
-
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
     <script src="scripts/ng-websocket-log-viewer-1.0.0.js"></script>
     <script src="scripts/web-viewer.js"></script>
