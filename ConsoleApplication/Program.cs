@@ -24,7 +24,7 @@ namespace ConsoleApplication
                     log.Warn("This is a warning.");
                     log.Info("This is information.");
 
-                    await Task.Delay(10000);
+                    await Task.Delay(1000);
                 }
             });
 

@@ -6,8 +6,12 @@
     $scope.newSoureColor = '#FFFFFF';
     $scope.newSource = 'ws://127.0.0.1:9001';
 
+    var sourceCount = 1;
+    var colors = ['#FFFFFF', '#CCCCFF', '#FFB2B2', '#FFFFCC', '#E0FFD6', '#AEAEAE'];
+
     $scope.addSource = function (source, color) {
         $rootScope.$broadcast('websocket-log-viewer-add-source', [source, color]);
+        $scope.newSoureColor = colors[sourceCount++ % colors.length];
     };
 
     $scope.filter = function (expression) {
@@ -18,7 +22,7 @@
         $rootScope.$broadcast('websocket-log-viewer-line-count', [count]);
     };
 
-    $scope.setLineCount($scope.numberOfLines);   
+    $scope.setLineCount($scope.numberOfLines);
 })
 
 .directive('expandOnFocus', function () {

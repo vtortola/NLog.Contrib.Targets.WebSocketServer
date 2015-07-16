@@ -45,11 +45,11 @@ angular.module("ng-websocket-log-viewer", [])
         };
 
         ws.onclose = function () {
-            connectionRetry(url, color, retry++);
+            connectionRetry(url, color, retry);
         };
 
         ws.onerror = function () {
-            connectionRetry(url, color, retry++);
+            showMessage("Error on '" + url + "' connection.", color);
         };
     };
 
@@ -73,14 +73,15 @@ angular.module("ng-websocket-log-viewer", [])
 
     var connectionRetry = function (url, color, retry) {
 
-        showMessage("Disconnected from '" + url + "' " + retry + " times.", color);
-
-        if (retry >= 10) {
+        if (retry > 10) {
+            showMessage("Retried connection to '" + url + "' 10 times. Giving up.", color);
             return;
+        } else {
+            showMessage("Disconnected from '" + url + "' " + retry + " times, retrying again in 2 seconds.", color);
         }
 
-        showMessage("Retrying connection to '" + url + "' in 2 seconds.", color);
-
+        retry++;
+               
         setTimeout(function () {
             connect(url, color, retry);
         }, 2000);
