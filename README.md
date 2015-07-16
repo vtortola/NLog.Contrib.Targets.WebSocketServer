@@ -58,6 +58,33 @@ Configure `NLog.Targets.WebsocketServer` as a new target.
   </nlog>
 ```
 
+## Output
+The WebSocket server broadcast JSON objects like this:
+```json
+{
+   "Timestamp":2015071602553825,
+   "Line":"2015-07-16 21:55:38.2576|INFO||This is information."
+}
+```
+ * `Timestamp`: Is the server date and time in `yyyyMMddHHmmssff` format.
+ * `Line` : The actual formated log entry.
+
+## Input
+The component accepts JSON commands to request special behaviours.
+
+#### Filter by Regular Expression
+Instructs the component to only send the lines that match a give Regular Expression. Send an empty or null expression to reset it.
+```json
+{
+   "command":"filter",
+   "filter": <RegEx>
+}
+```
+
+
+
+
+
 ### Links
  * [Extending NLog](//github.com/nlog/nlog/wiki/Extending%20NLog)
  * [WebSocketListener](//vtortola.github.io/WebSocketListener/)
