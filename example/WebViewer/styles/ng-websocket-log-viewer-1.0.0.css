@@ -8,4 +8,15 @@
 
 .log-viewer-logentry{
     white-space:nowrap;
+    height:15px;
+    vertical-align:bottom;
+}
+
+.log-viewer-server-color{
+    width:5px;
+    height:15px;
+    display:inline-block;
+    margin-right:10px;
+    border:1px solid black;
+    vertical-align:bottom;
 }

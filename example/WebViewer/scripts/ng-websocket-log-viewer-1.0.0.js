@@ -9,7 +9,7 @@ angular.module("ng-websocket-log-viewer", [])
     var lastTimespan = 0;
 
     $scope.$on('websocket-log-viewer-add-source', function (event, args) {
-        connect(args[0], args[1], 1);
+        connect(args[0], args[1], 0);
     });
         
     $scope.$on('websocket-log-viewer-filter', function (event, args) {
@@ -41,6 +41,8 @@ angular.module("ng-websocket-log-viewer", [])
 
     var saveEntry = function (entry) {
         if (paused) {
+            while (cache.length > maxLines)
+                cache.shift()
             cache.push(entry);
         }
         else {
@@ -99,16 +101,15 @@ angular.module("ng-websocket-log-viewer", [])
 
         if (retry > 10) {
             showMessage("Retried connection to '" + url + "' 10 times. Giving up.", color);
-            return;
         } else {
-            showMessage("Disconnected from '" + url + "' " + retry + " times, retrying again in 2 seconds.", color);
-        }
+            retry++;
+            var seconds = 5 * retry;
 
-        retry++;
-               
-        setTimeout(function () {
-            connect(url, color, retry);
-        }, 2000);
+            setTimeout(function () {
+                connect(url, color, retry);
+            }, seconds * 1000);
+            showMessage("Disconnected from '" + url + "' " + retry + " times, retrying again in " + seconds + " seconds.", color);
+        }
     };
 
     var sendFilter = function (server, expression) {
@@ -132,7 +133,7 @@ angular.module("ng-websocket-log-viewer", [])
     return {
         restrict: 'E',
         replace: true,
-        template: '<div class="log-viewer"><div class="log-viewer-entry" ng-repeat="logline in loglines" ng-style="{ color: logline.color}">{{logline.Line}}</div></div>',
+        template: '<div class="log-viewer"><div class="log-viewer-entry" ng-repeat="logline in loglines"><span class="log-viewer-server-color" ng-style="{ backgroundColor: logline.color}"></span><span>{{logline.Line}}</span></div></div>',
         controller: 'websocketLogViewerController'
     };
 })

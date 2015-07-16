@@ -8,7 +8,7 @@
     $scope.paused = false;
 
     var sourceCount = 1;
-    var colors = ['#FFFFFF', '#CCCCFF', '#FFB2B2', '#FFFFCC', '#E0FFD6', '#AEAEAE'];
+    var colors = ['#FFFFFF', '#FFFF00', '#FF0000', '#00FF00', '#0000FF', '#00FFFF', '#9933FF'];
 
     $scope.addSource = function (source, color) {
         $rootScope.$broadcast('websocket-log-viewer-add-source', [source, color]);
