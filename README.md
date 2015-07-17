@@ -31,7 +31,7 @@ Just drop the following libraries in your bin folder:
 ## Configuration
 Configure `NLog.Targets.WebsocketServer` as a new target.
 #### Required configuration parameters:
- * `port`: Indicates in which connection will the WebSocket server listen for new connections.
+ * `Port` (Int32): Indicates in which connection will the WebSocket server listen for new connections.
 
 #### Optional configuation parameters:
  * `IPAddressStartsWith (String)`: Indicates how the client IP address must start to be accepted. Loopback interface is always accepted. A example value would be `192.168.`. An empty string means that all connections are accepted.
