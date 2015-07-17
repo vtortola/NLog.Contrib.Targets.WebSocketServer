@@ -1,15 +1,15 @@
 # NLog.Targets.WebSocketServer
 
-Allows to broadcast your servers´ logs to websocket connections in real-time with minimal effort. Subscribe to a regular expressions to remove undesired lines. Simplifies log monitoring, allowing that a simple web browser to watch over multiple servers´ logs interpolating the lines by timestamp.
+Allows to broadcast your servers´ logs to websocket connections in real-time with minimal effort. Subscribe to a regular expressions to remove undesired lines. Simplifies log monitoring, allowing that a simple web browser to watch over multiple servers´ logs interpolating the lines by timestamp. Not a replacement of a proper monitoring tool, but handy for watching over logs with little logistic effort.
 
-NLog.Targets.WebSocketServer is a [NLog target](https://github.com/nlog/nlog/wiki/Targets) that instead of writing on a file, or showing the log on the console, broadcast the log entries through websockets.
+NLog.Targets.WebSocketServer is a [NLog target](https://github.com/nlog/nlog/wiki/Targets) that instead of writing on a file, or showing the log on the console, broadcast the log entries to the connected websocket connections.
 
 Features:
- * **Fully integrated with NLog**: it does not require changes in your application.
- * **Self-hosted**: it does not need IIS or any hosting framework.
+ * **Fully integrated with NLog**: it does not require changes in your application code beyond the configuration.
+ * **Self-hosted**: it does not need IIS or any hosting framework, [WebSocketListener](http://vtortola.github.io/WebSocketListener/) is socket based.
  * **Mono compatible**: Both NLog and WebSocketListener are compatible with Mono.
  * **Subscribe to Regular Expressions**: Is it possible to send a message throug the WebSocket connection to indicate the expression to which you want to subscribe. Only log entries matching that regex will be sent.
- * **Scalable**: It uses an asynchronous WebSocket server. 
+ * **Scalable**: NLog and WebSocketListener components are decoupled by a [producer-consumer pattern](http://www.ni.com/white-paper/3023/en/), so NLog will append the log entry to `WebSocketServerTarget` in `O(1)` time always, and another thread/threads are responsible of distributing that log entry to the clients. Still, if the component has a big number of connected clients, it may interfere with your application performance. See the `MaxConnectedClients` configuration setting.
  
 Checkout this example of a log viewer done in AngularJS. 
 
@@ -36,6 +36,9 @@ Configure `NLog.Targets.WebsocketServer` as a new target.
 #### Optional configuation parameters:
  * `IPAddressStartsWith`: Indicates how the client IP address must start to be accepted. Loopback interface is always accepted. A example value would be `192.168.`. An empty string means that all connections are accepted.
  * `ThrowExceptionIfSetupFails`: By default `NLog.Targets.WebSocketServerTarget` will fail silently if does not succeed trying to set up the websocket server (e.g.: because the port is already in use), and it will be automatically disabled. In production you may not want the application to crash because one of your targets failed, but during development you would like to get an exception indicatig the issue. 
+ 
+ * `MaxConnectedClients`: The maximum number of allowed connections. By default 100.
+ * `ClientTimeOut`: The amount of time without client [pong responses](https://tools.ietf.org/html/rfc6455#section-5.5.2). By default 10 seconds.
 
 ```xml
   <nlog>
