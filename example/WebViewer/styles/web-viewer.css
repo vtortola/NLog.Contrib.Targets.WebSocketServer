@@ -51,6 +51,10 @@ button{
     width:100px;
 }
 
+#highlight{
+    width:100px;
+}
+
 #log-container{
     margin-top:60px;
 }

@@ -19,7 +19,17 @@ namespace NLog.Targets.WebSocketServer
         public String IPAddressStartsWith { get; set; }
 
         public Boolean ThrowExceptionIfSetupFails { get; set; }
-        
+
+        public Int32 MaxConnectedClients { get; set; }
+
+        public TimeSpan ClientTimeOut { get; set; }
+
+        public WebSocketServerTarget()
+        {
+            MaxConnectedClients = 100;
+            ClientTimeOut = TimeSpan.FromSeconds(5);
+        }
+
         protected override void InitializeTarget()
         {
             try

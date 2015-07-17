@@ -1,12 +1,12 @@
 angular.module("ng-websocket-log-viewer", [])
 
-.controller('websocketLogViewerController', function ($scope) {
+.controller('websocketLogViewerController', function ($scope, $sce) {
 
     $scope.loglines = [];
     var servers = [];
     var maxLines = 50;
-
     var lastTimespan = 0;
+    var highlighted = {};
 
     $scope.$on('websocket-log-viewer-add-source', function (event, args) {
         connect(args[0], args[1], 0);
@@ -16,6 +16,10 @@ angular.module("ng-websocket-log-viewer", [])
         servers.forEach(function (server) {
             sendFilter(server, args[0]);
         });
+    });
+
+    $scope.$on('websocket-log-viewer-highlight', function (event, args) {
+        highlight(args[0], args[1], args[2]);
     });
     
     $scope.$on('websocket-log-viewer-line-count', function (event, args) {
@@ -31,7 +35,7 @@ angular.module("ng-websocket-log-viewer", [])
     var pause = function () {
         if (paused) {
             for (var i = 0; i < cache.length; i++) {
-                $scope.loglines.push(cache[i]);
+                pushEntryIntoScope(cache[i]);
             }
             cache = [];
             updateLogBoard();
@@ -46,10 +50,38 @@ angular.module("ng-websocket-log-viewer", [])
             cache.push(entry);
         }
         else {
-            $scope.loglines.push(entry);
+            pushEntryIntoScope(entry);
             updateLogBoard();
         }
-    }
+    };
+
+    var highlight = function (text, id, color) {
+        if (text) {
+            color.text = text;
+            highlighted[id] = color;
+        }
+        else if (highlighted[id]) {
+            delete highlighted[id];
+        }
+    };
+
+    var pushEntryIntoScope = function (entry) {
+        
+        for (var id in highlighted) {
+
+            var item = highlighted[id];
+
+            if (!item.text || !item.background)
+                continue;
+
+            if (entry.Line.indexOf(item.text) != -1) {
+                entry.Line = entry.Line.replace(item.text, "<span class='highlight' style='background-color:"+item.background+";color:"+item.foreground+";'>" + item.text + "</span>");
+            }
+        }
+
+        entry.Line = $sce.trustAsHtml(entry.Line);
+        $scope.loglines.push(entry);
+    };
 
     var connect = function (url, color, retry) {
  
@@ -90,7 +122,7 @@ angular.module("ng-websocket-log-viewer", [])
     };
 
     var showMessage = function (line, color) {
-        saveEntry({
+        pushEntryIntoScope({
             Timestamp: lastTimespan++,
             Line: line,
             color: color
@@ -133,7 +165,7 @@ angular.module("ng-websocket-log-viewer", [])
     return {
         restrict: 'E',
         replace: true,
-        template: '<div class="log-viewer"><div class="log-viewer-entry" ng-repeat="logline in loglines"><span class="log-viewer-server-color" ng-style="{ backgroundColor: logline.color}"></span><span>{{logline.Line}}</span></div></div>',
+        template: '<div class="log-viewer"><div class="log-viewer-entry" ng-repeat="logline in loglines"><span class="log-viewer-server-color" ng-style="{ backgroundColor: logline.color}"></span><span ng-bind-html="logline.Line"></span></div></div>',
         controller: 'websocketLogViewerController'
     };
 })

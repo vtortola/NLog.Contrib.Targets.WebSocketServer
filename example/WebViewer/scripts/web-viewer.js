@@ -8,7 +8,7 @@
     $scope.paused = false;
 
     var sourceCount = 1;
-    var colors = ['#FFFFFF', '#FFFF00', '#FF0000', '#00FF00', '#0000FF', '#00FFFF', '#9933FF'];
+    var colors = ['#FFFFFF', '#00FF00', '#FF0000', '#0000FF', '#FFFF00', '#9933FF'];
 
     $scope.addSource = function (source, color) {
         $rootScope.$broadcast('websocket-log-viewer-add-source', [source, color]);
@@ -17,6 +17,10 @@
 
     $scope.filter = function (expression) {
         $rootScope.$broadcast('websocket-log-viewer-filter', [expression]);
+    };
+
+    $scope.highlight = function (highlightText) {
+        $rootScope.$broadcast('websocket-log-viewer-highlight', [highlightText, 1, {background:'yellow', foreground:'black'}]);
     };
 
     $scope.setLineCount = function (count) {

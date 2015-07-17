@@ -20,3 +20,7 @@
     border:1px solid black;
     vertical-align:bottom;
 }
+
+.highlight{
+    padding:0 2px;
+}
