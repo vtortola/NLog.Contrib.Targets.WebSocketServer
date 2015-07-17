@@ -7,6 +7,8 @@ angular.module("ng-websocket-log-viewer", [])
     var maxLines = 50;
     var lastTimespan = 0;
     var highlighted = {};
+    var paused = false;
+    var cache = [];
 
     $scope.$on('websocket-log-viewer-add-source', function (event, args) {
         connect(args[0], args[1], 0);
@@ -30,8 +32,6 @@ angular.module("ng-websocket-log-viewer", [])
         pause();
     });
 
-    var paused = false;
-    var cache = [];
     var pause = function () {
         if (paused) {
             for (var i = 0; i < cache.length; i++) {
@@ -51,7 +51,6 @@ angular.module("ng-websocket-log-viewer", [])
         }
         else {
             pushEntryIntoScope(entry);
-            updateLogBoard();
         }
     };
 
@@ -78,9 +77,9 @@ angular.module("ng-websocket-log-viewer", [])
                 entry.Line = entry.Line.replace(item.text, "<span class='highlight' style='background-color:"+item.background+";color:"+item.foreground+";'>" + item.text + "</span>");
             }
         }
-
         entry.Line = $sce.trustAsHtml(entry.Line);
         $scope.loglines.push(entry);
+        updateLogBoard();
     };
 
     var connect = function (url, color, retry) {
@@ -107,7 +106,7 @@ angular.module("ng-websocket-log-viewer", [])
             connectionRetry(url, color, retry);
         };
 
-        ws.onerror = function () {
+        ws.onerror = function () {   
             showMessage("Error on '" + url + "' connection.", color);
         };
     };

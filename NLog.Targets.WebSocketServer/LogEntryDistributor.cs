@@ -25,13 +25,18 @@ namespace NLog.Targets.WebSocketServer
         readonly List<WebSocketWrapper> _connections;
         readonly JsonSerializer _serializer;
         readonly String _ipAddressStart;
+        readonly Int32 _maxConnectedClients;
 
         Int32 _disposed;
 
-        public LogEntryDistributor(Int32 port, String ipAddressStart)
+        public LogEntryDistributor(Int32 port, String ipAddressStart, Int32 maxConnectedClients, TimeSpan clientTimeout)
         {
+            _maxConnectedClients = maxConnectedClients;
             _ipAddressStart = ipAddressStart;
-            _listener = new WebSocketListener(new IPEndPoint(IPAddress.Any, port));
+            _listener = new WebSocketListener(new IPEndPoint(IPAddress.Any, port), new WebSocketListenerOptions
+            {
+                PingTimeout = clientTimeout
+            });
             _listener.Standards.RegisterStandard(new vtortola.WebSockets.Rfc6455.WebSocketFactoryRfc6455());
             _cancel = new CancellationTokenSource();
             _block = new BufferBlock<LogEntry>(new DataflowBlockOptions() { CancellationToken = _cancel.Token });
@@ -61,6 +66,9 @@ namespace NLog.Targets.WebSocketServer
 
         private bool CanAcceptConnection(WebSocket con)
         {
+            if (_connections.Count >= _maxConnectedClients)
+                return false;
+
             if (String.IsNullOrEmpty(_ipAddressStart))
                 return true;
 

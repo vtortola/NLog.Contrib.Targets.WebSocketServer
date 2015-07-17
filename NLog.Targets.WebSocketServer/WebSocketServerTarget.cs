@@ -34,7 +34,7 @@ namespace NLog.Targets.WebSocketServer
         {
             try
             {
-                _distributor = new LogEntryDistributor(Port, IPAddressStartsWith);
+                _distributor = new LogEntryDistributor(Port, IPAddressStartsWith, MaxConnectedClients, ClientTimeOut);
                 _enabled = true;
             }
             catch(Exception)
