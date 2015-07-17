@@ -39,6 +39,7 @@ Configure `NLog.Targets.WebsocketServer` as a new target.
  
  * `MaxConnectedClients (Int32)`: The maximum number of allowed connections. By default 100.
  * `ClientTimeOut (TimeSpan)`: The amount of time without client [pong responses](https://tools.ietf.org/html/rfc6455#section-5.5.2). By default 10 seconds.
+ * `MaximunConnectionLength (TimeSpan)`: The amount of time that a client can be connected. The server will issue a special application closing message that the client must understand as "I am disconnecting you, please do not retry". This is to cover the case were somebody leaves the client application opened by mistake. Default is 6 hours. Zero would mean "no limit".
 
 ```xml
   <nlog>
