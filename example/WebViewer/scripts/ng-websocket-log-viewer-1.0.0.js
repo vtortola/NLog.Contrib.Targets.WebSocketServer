@@ -16,8 +16,7 @@ angular.module("ng-websocket-log-viewer", [])
         }
     };
 })
-
-
+    
 .controller('websocketLogViewerController', function ($scope, $sce, websocketLogViewerConstants) {
 
     $scope.loglines = [];
@@ -77,24 +76,27 @@ angular.module("ng-websocket-log-viewer", [])
     var highlight = function (param) {
         if (param.text && param.text.length >= 2) {
             highlighted[param.id] = param;
+            for (var i = 0; i < $scope.loglines.length; i++) {
+                var entry = $scope.loglines[i];
+                entry.HtmlLine = entry.Line;
+                highlightInLogEntry(entry);
+                entry.HtmlLine = $sce.trustAsHtml(entry.HtmlLine);
+            }
         }
         else if (highlighted[param.id]) {
             delete highlighted[param.id];
         }
     };
 
-    var pushEntryIntoScope = function (entry) {
-        
-        entry.HtmlLine = entry.Line;
-
+    var highlightInLogEntry = function (entry) {
         for (var id in highlighted) {
             var item = highlighted[id];
 
             if (!item.text || !item.class)
                 continue;
-      
+
             var isSomethingHighlighted = false;
-            while(entry.HtmlLine.indexOf(item.text) != -1) {
+            while (entry.HtmlLine.indexOf(item.text) != -1) {
                 var text = item.text[0];
                 text += "<span class='match-breaker'></span>";
                 text += item.text.substr(1, item.text.length - 1);
@@ -103,8 +105,15 @@ angular.module("ng-websocket-log-viewer", [])
             }
 
             if (isSomethingHighlighted)
-                $scope.$emit(websocketLogViewerConstants.events.highlighted, { text: item.text, 'class': item.class, id:item.id });
+                $scope.$emit(websocketLogViewerConstants.events.highlighted, { text: item.text, 'class': item.class, id: item.id });
         }
+    };
+
+    var pushEntryIntoScope = function (entry) {
+        
+        entry.HtmlLine = entry.Line;
+        highlightInLogEntry(entry);
+
         entry.HtmlLine = $sce.trustAsHtml(entry.HtmlLine);
         $scope.loglines.push(entry);
         updateLogBoard();
@@ -133,7 +142,6 @@ angular.module("ng-websocket-log-viewer", [])
 
         ws.onclose = function () {
             connectionRetry(parameters, retry);
-            $scope.$emit(websocketLogViewerConstants.events.disconnected, { url: parameters.url, color: parameters.color });
         };
 
         ws.onerror = function () {   
@@ -160,6 +168,7 @@ angular.module("ng-websocket-log-viewer", [])
 
     var connectionRetry = function (parameters, retry) {
 
+        var willRetryIn = 0;
         if (retry > 10) {
             showMessage("Retried connection to '" + parameters.url + "' 10 times. Giving up.", parameters.color);
         } else {
@@ -169,8 +178,10 @@ angular.module("ng-websocket-log-viewer", [])
             setTimeout(function () {
                 connect(parameters, retry);
             }, seconds * 1000);
+            willRetryIn = seconds;
             showMessage("Disconnected from '" + parameters.url + "' " + retry + " times, retrying again in " + seconds + " seconds.", parameters.color);
         }
+        $scope.$emit(websocketLogViewerConstants.events.disconnected, { url: parameters.url, color: parameters.color, willRetry:!!willRetryIn, willRetryIn:willRetryIn });
     };
 
     var sendFilter = function (server, expression) {
