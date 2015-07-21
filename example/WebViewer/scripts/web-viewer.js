@@ -1,6 +1,6 @@
 ﻿angular.module("nglog-websockeet-demo", ['ng-websocket-log-viewer'])
 
-.controller("headerController", function ($scope, $rootScope, websocketLogViewerConstants) {
+.controller("logController", function ($scope, $rootScope, websocketLogViewerConstants) {
 
     $scope.numberOfLines = 50;
     $scope.newSoureColor = '#FFFFFF';
@@ -11,7 +11,7 @@
     var colors = ['#FFFFFF', '#00FF00', '#FF0000', '#0000FF', '#FFFF00', '#9933FF'];
 
     $scope.addSource = function (source, color) {
-        $rootScope.$broadcast(websocketLogViewerConstants.commands.addSource, { url: source, color: color, id:sourceCount });
+        $scope.$broadcast(websocketLogViewerConstants.commands.connect, { url: source, color: color, id: sourceCount });
         $scope.newSoureColor = colors[sourceCount++ % colors.length];
     };
 
@@ -32,10 +32,14 @@
         $scope.paused = !$scope.paused;
     };
 
+    $scope.$on(websocketLogViewerConstants.events.highlighted, function (event, args) {
+        console.log(args);
+    });
+
     setTimeout(function () {
         $scope.setLineCount($scope.numberOfLines);
-        $rootScope.$broadcast(websocketLogViewerConstants.commands.highlight, { text: "ERROR", id: 2, 'class': 'log-highlight-error' });
-        $rootScope.$broadcast(websocketLogViewerConstants.commands.highlight, { text: "WARN", id: 3, 'class': 'log-highlight-warn' });
+        $rootScope.$broadcast(websocketLogViewerConstants.commands.highlight, { text: "ERROR", id: 2, 'class': 'log-highlight-error', silent:true });
+        $rootScope.$broadcast(websocketLogViewerConstants.commands.highlight, { text: "WARN", id: 3, 'class': 'log-highlight-warn', silent:true });
     }, 500);
 })
 

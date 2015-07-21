@@ -6,9 +6,9 @@
     <link href="styles/web-viewer.css" rel="stylesheet" />
     <link rel="shortcut icon" href="//angularjs.org/favicon.ico" type="image/x-icon">
 </head>
-<body ng-app="nglog-websockeet-demo">
+<body ng-app="nglog-websockeet-demo" ng-controller="logController">
 
-    <div id="header" ng-controller="headerController">
+    <div id="header">
         <label>Number of lines</label><input type="number" ng-model="numberOfLines" ng-model-options="{ debounce: 500 }" ng-change="setLineCount(numberOfLines)" />
         <button ng-click="pause()" ng-class="{blink : paused}">Pause</button>
         <label>Add source</label><input id="add-source" expand-on-focus="400" type="text" ng-model="newSource" /><input type="color" ng-model="newSoureColor" /><button ng-click="addSource(newSource, newSoureColor)">Add</button>
