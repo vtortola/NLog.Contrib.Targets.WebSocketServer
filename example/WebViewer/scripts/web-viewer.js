@@ -1,6 +1,6 @@
 ﻿angular.module("nglog-websockeet-demo", ['ng-websocket-log-viewer'])
 
-.controller("logController", function ($scope, $rootScope, websocketLogViewerConstants) {
+.controller("logController", function ($scope, $rootScope, websocketLogConstants) {
 
     $scope.numberOfLines = 50;
     $scope.newSoureColor = '#FFFFFF';
@@ -11,35 +11,35 @@
     var colors = ['#FFFFFF', '#00FF00', '#FF0000', '#0000FF', '#FFFF00', '#9933FF'];
 
     $scope.addSource = function (source, color) {
-        $scope.$broadcast(websocketLogViewerConstants.commands.connect, { url: source, color: color, id: sourceCount });
+        $scope.$broadcast(websocketLogConstants.commands.connect, { url: source, color: color, id: sourceCount });
         $scope.newSoureColor = colors[sourceCount++ % colors.length];
     };
 
     $scope.filter = function (expression) {
-        $rootScope.$broadcast(websocketLogViewerConstants.commands.filter, { expression: expression });
+        $rootScope.$broadcast(websocketLogConstants.commands.filter, { expression: expression });
     };
 
     $scope.highlight = function (highlightText) {
-        $rootScope.$broadcast(websocketLogViewerConstants.commands.highlight, {text:highlightText, id:1, 'class': 'log-highlight' });
+        $rootScope.$broadcast(websocketLogConstants.commands.highlight, { text: highlightText, id: 1, 'class': 'log-highlight' });
     };
 
     $scope.setLineCount = function (count) {
-        $rootScope.$broadcast(websocketLogViewerConstants.commands.lineCount, { count: count });
+        $rootScope.$broadcast(websocketLogConstants.commands.lineCount, { count: count });
     };
 
     $scope.pause = function () {
-        $rootScope.$broadcast(websocketLogViewerConstants.commands.pause);
+        $rootScope.$broadcast(websocketLogConstants.commands.pause);
         $scope.paused = !$scope.paused;
     };
 
-    $scope.$on(websocketLogViewerConstants.events.highlighted, function (event, args) {
+    $scope.$on(websocketLogConstants.events.highlighted, function (event, args) {
         console.log(args);
     });
 
     setTimeout(function () {
         $scope.setLineCount($scope.numberOfLines);
-        $rootScope.$broadcast(websocketLogViewerConstants.commands.highlight, { text: "ERROR", id: 2, 'class': 'log-highlight-error', silent:true });
-        $rootScope.$broadcast(websocketLogViewerConstants.commands.highlight, { text: "WARN", id: 3, 'class': 'log-highlight-warn', silent:true });
+        $rootScope.$broadcast(websocketLogConstants.commands.highlight, { text: "ERROR", id: 2, 'class': 'log-highlight-error', silent: true });
+        $rootScope.$broadcast(websocketLogConstants.commands.highlight, { text: "WARN", id: 3, 'class': 'log-highlight-warn', silent: true });
     }, 500);
 })
 
