@@ -31,7 +31,7 @@ angular.module("ng-websocket-log-viewer", [])
         
     $scope.$on(websocketLogViewerConstants.commands.filter, function (event, args) {
         servers.forEach(function (server) {
-            sendFilter(server, args);
+            sendFilter(server, args.expression);
         });
     });
 
@@ -123,7 +123,7 @@ angular.module("ng-websocket-log-viewer", [])
         };
 
         ws.onclose = function () {
-            connectionRetry(parameters.url, parameters.color, retry);
+            connectionRetry(parameters, retry);
         };
 
         ws.onerror = function () {   
@@ -148,18 +148,18 @@ angular.module("ng-websocket-log-viewer", [])
         });
     };
 
-    var connectionRetry = function (url, color, retry) {
+    var connectionRetry = function (parameters, retry) {
 
         if (retry > 10) {
-            showMessage("Retried connection to '" + url + "' 10 times. Giving up.", color);
+            showMessage("Retried connection to '" + parameters.url + "' 10 times. Giving up.", parameters.color);
         } else {
             retry++;
             var seconds = 5 * retry;
 
             setTimeout(function () {
-                connect(url, color, retry);
+                connect(parameters, retry);
             }, seconds * 1000);
-            showMessage("Disconnected from '" + url + "' " + retry + " times, retrying again in " + seconds + " seconds.", color);
+            showMessage("Disconnected from '" + parameters.url + "' " + retry + " times, retrying again in " + seconds + " seconds.", parameters.color);
         }
     };
 

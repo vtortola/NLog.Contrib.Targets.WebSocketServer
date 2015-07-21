@@ -207,7 +207,9 @@ namespace NLog.Targets.WebSocketServer
                     handler.Handle(json, wsWrapper);
                 }
             }
-            catch { }
+            catch(Exception)
+            {
+            }
         }
 
         private void RemoveDisconnected()
