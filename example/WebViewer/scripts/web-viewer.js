@@ -1,6 +1,6 @@
 ﻿angular.module("nglog-websockeet-demo", ['ng-websocket-log-viewer'])
 
-.controller("logController", function ($scope, $rootScope, websocketLogConstants) {
+.controller("logController", ['$scope', 'websocketLogConstants', function ($scope, websocketLogConstants) {
 
     $scope.numberOfLines = 50;
     $scope.newSoureColor = '#FFFFFF';
@@ -16,19 +16,19 @@
     };
 
     $scope.filter = function (expression) {
-        $rootScope.$broadcast(websocketLogConstants.commands.filter, { expression: expression });
+        $scope.$broadcast(websocketLogConstants.commands.filter, { expression: expression });
     };
 
     $scope.highlight = function (highlightText) {
-        $rootScope.$broadcast(websocketLogConstants.commands.highlight, { text: highlightText, id: 1, 'class': 'log-highlight' });
+        $scope.$broadcast(websocketLogConstants.commands.highlight, { text: highlightText, id: 1, 'class': 'log-highlight' });
     };
 
     $scope.setLineCount = function (count) {
-        $rootScope.$broadcast(websocketLogConstants.commands.lineCount, { count: count });
+        $scope.$broadcast(websocketLogConstants.commands.lineCount, { count: count });
     };
 
     $scope.pause = function () {
-        $rootScope.$broadcast(websocketLogConstants.commands.pause);
+        $scope.$broadcast(websocketLogConstants.commands.pause);
         $scope.paused = !$scope.paused;
     };
 
@@ -38,10 +38,10 @@
 
     setTimeout(function () {
         $scope.setLineCount($scope.numberOfLines);
-        $rootScope.$broadcast(websocketLogConstants.commands.highlight, { text: "ERROR", id: 2, 'class': 'log-highlight-error', silent: true });
-        $rootScope.$broadcast(websocketLogConstants.commands.highlight, { text: "WARN", id: 3, 'class': 'log-highlight-warn', silent: true });
+        $scope.$broadcast(websocketLogConstants.commands.highlight, { text: "ERROR", id: 2, 'class': 'log-highlight-error', silent: true });
+        $scope.$broadcast(websocketLogConstants.commands.highlight, { text: "WARN", id: 3, 'class': 'log-highlight-warn', silent: true });
     }, 500);
-})
+}])
 
 .directive('expandOnFocus', function () {
     return {

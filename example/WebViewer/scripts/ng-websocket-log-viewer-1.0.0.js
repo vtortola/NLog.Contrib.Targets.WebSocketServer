@@ -18,7 +18,7 @@ angular.module("ng-websocket-log-viewer", [])
     };
 })
 
-.factory('websocketLogEntryFormatter', function ($sce, websocketLogConstants) {
+.factory('websocketLogEntryFormatterFactory', ['$sce', 'websocketLogConstants', function ($sce, websocketLogConstants) {
     return function ($scope) {
         var me = {};
         var highlighted = {};
@@ -64,9 +64,9 @@ angular.module("ng-websocket-log-viewer", [])
 
         return me;
     };
-})
+}])
     
-.controller('websocketLogViewerController', function ($scope, websocketLogConstants, websocketLogEntryFormatter) {
+.controller('websocketLogViewerController', ['$scope', 'websocketLogConstants', 'websocketLogEntryFormatterFactory', function ($scope, websocketLogConstants, websocketLogEntryFormatterFactory) {
 
     $scope.loglines = [];
     var servers = [];
@@ -77,7 +77,7 @@ angular.module("ng-websocket-log-viewer", [])
     var cache = [];
     var lineIdCounter = 0;
 
-    websocketLogEntryFormatter = websocketLogEntryFormatter($scope);
+    var websocketLogEntryFormatter = websocketLogEntryFormatterFactory($scope);
 
     $scope.$on(websocketLogConstants.commands.connect, function (event, args) {
         connect(args, 0);
@@ -220,7 +220,7 @@ angular.module("ng-websocket-log-viewer", [])
         else
             return 0;
     };
-})
+}])
 
 .directive('websocketLogViewer', function () {
     return {
