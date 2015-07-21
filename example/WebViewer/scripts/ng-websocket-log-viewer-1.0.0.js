@@ -77,10 +77,7 @@ angular.module("ng-websocket-log-viewer", [])
         if (param.text && param.text.length >= 2) {
             highlighted[param.id] = param;
             for (var i = 0; i < $scope.loglines.length; i++) {
-                var entry = $scope.loglines[i];
-                entry.HtmlLine = entry.Line;
-                highlightInLogEntry(entry);
-                entry.HtmlLine = $sce.trustAsHtml(entry.HtmlLine);
+                formatEntry($scope.loglines[i]);
             }
         }
         else if (highlighted[param.id]) {
@@ -109,12 +106,14 @@ angular.module("ng-websocket-log-viewer", [])
         }
     };
 
-    var pushEntryIntoScope = function (entry) {
-        
+    var formatEntry = function (entry) {
         entry.HtmlLine = entry.Line;
         highlightInLogEntry(entry);
-
         entry.HtmlLine = $sce.trustAsHtml(entry.HtmlLine);
+    }
+
+    var pushEntryIntoScope = function (entry) {
+        formatEntry(entry);
         $scope.loglines.push(entry);
         updateLogBoard();
     };
