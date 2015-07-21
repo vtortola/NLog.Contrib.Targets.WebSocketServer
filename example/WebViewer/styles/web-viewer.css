@@ -71,3 +71,15 @@ button{
     50% { opacity:.7;}
     100% { opacity: 1.0; }
 }
+.log-highlight{
+    background-color:yellow;
+    color:black;
+}
+.log-highlight-error{
+    background-color:darkred;
+    color:white;
+}
+.log-highlight-warn{
+    background-color:lightgoldenrodyellow;
+    color:dimgray;
+}

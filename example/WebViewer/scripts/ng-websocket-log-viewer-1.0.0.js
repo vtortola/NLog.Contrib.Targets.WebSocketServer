@@ -1,6 +1,21 @@
 angular.module("ng-websocket-log-viewer", [])
 
-.controller('websocketLogViewerController', function ($scope, $sce) {
+.factory('websocketLogViewerConstants', function () {
+    return {
+        commands: {
+            addSource: 'websocket-log-viewer-add-source',
+            filter: 'websocket-log-viewer-filter',
+            highlight: 'websocket-log-viewer-highlight',
+            lineCount: 'websocket-log-viewer-line-count',
+            pause: 'websocket-log-viewer-pause'
+        },
+        events: {
+
+        }
+    };
+})
+
+.controller('websocketLogViewerController', function ($scope, $sce, websocketLogViewerConstants) {
 
     $scope.loglines = [];
     var servers = [];
@@ -10,25 +25,27 @@ angular.module("ng-websocket-log-viewer", [])
     var paused = false;
     var cache = [];
 
-    $scope.$on('websocket-log-viewer-add-source', function (event, args) {
-        connect(args[0], args[1], 0);
+    $scope.$on(websocketLogViewerConstants.commands.addSource, function (event, args) {
+        connect(args, 0);
     });
         
-    $scope.$on('websocket-log-viewer-filter', function (event, args) {
+    $scope.$on(websocketLogViewerConstants.commands.filter, function (event, args) {
         servers.forEach(function (server) {
-            sendFilter(server, args[0]);
+            sendFilter(server, args);
         });
     });
 
-    $scope.$on('websocket-log-viewer-highlight', function (event, args) {
-        highlight(args[0], args[1], args[2]);
+    $scope.$on(websocketLogViewerConstants.commands.highlight, function (event, args) {
+        highlight(args);
     });
     
-    $scope.$on('websocket-log-viewer-line-count', function (event, args) {
-        maxLines = Number(args[0]);
+    $scope.$on(websocketLogViewerConstants.commands.lineCount, function (event, args) {
+        var count = Number(args.count);
+        if (!isNaN(count))
+            maxLines = count;
     });
 
-    $scope.$on('websocket-log-viewer-pause', function (event) {
+    $scope.$on(websocketLogViewerConstants.commands.pause, function (event) {
         pause();
     });
 
@@ -54,60 +71,63 @@ angular.module("ng-websocket-log-viewer", [])
         }
     };
 
-    var highlight = function (text, id, color) {
-        if (text) {
-            color.text = text;
-            highlighted[id] = color;
+    var highlight = function (param) {
+        if (param.text && param.text.length >= 2) {
+            highlighted[param.id] = param;
         }
-        else if (highlighted[id]) {
-            delete highlighted[id];
+        else if (highlighted[param.id]) {
+            delete highlighted[param.id];
         }
     };
 
     var pushEntryIntoScope = function (entry) {
         
-        for (var id in highlighted) {
+        entry.HtmlLine = entry.Line;
 
+        for (var id in highlighted) {
             var item = highlighted[id];
 
-            if (!item.text || !item.background)
+            if (!item.text || !item.class)
                 continue;
-
-            if (entry.Line.indexOf(item.text) != -1) {
-                entry.Line = entry.Line.replace(item.text, "<span class='highlight' style='background-color:"+item.background+";color:"+item.foreground+";'>" + item.text + "</span>");
+      
+            while(entry.HtmlLine.indexOf(item.text) != -1) {
+                var text = item.text[0];
+                text += "<span class='match-breaker'></span>";
+                text += item.text.substr(1, item.text.length - 1);
+                entry.HtmlLine = entry.HtmlLine.replace(item.text, "<span class='highlight " + item.class + "'>" + text + "</span>");
             }
         }
-        entry.Line = $sce.trustAsHtml(entry.Line);
+        entry.HtmlLine = $sce.trustAsHtml(entry.HtmlLine);
         $scope.loglines.push(entry);
         updateLogBoard();
     };
 
-    var connect = function (url, color, retry) {
+    var connect = function (parameters, retry) {
  
-        var ws = new WebSocket(url);
-        showMessage("Connecting to '" + url + "' ...", color);
+        var ws = new WebSocket(parameters.url);
+        showMessage("Connecting to '" + parameters.url + "' ...", parameters.color);
         ws.onmessage = function (msg) {
 
             var entry = JSON.parse(msg.data);
-            entry.color = color;
+            entry.color = parameters.color;
             saveEntry(entry);
             lastTimespan = entry.Timestamp;
         }
         servers.push(ws);
 
         ws.onopen = function () {
-            showMessage("Connected to '" + url + "'.", color);
+            showMessage("Connected to '" + parameters.url + "'.", parameters.color);
             if ($scope.filterExpression) {
                 sendFilter(ws, $scope.filterExpression);
             }
         };
 
         ws.onclose = function () {
-            connectionRetry(url, color, retry);
+            connectionRetry(parameters.url, parameters.color, retry);
         };
 
         ws.onerror = function () {   
-            showMessage("Error on '" + url + "' connection.", color);
+            showMessage("Error on '" + parameters.url + "' connection.", parameters.color);
         };
     };
 
@@ -164,7 +184,7 @@ angular.module("ng-websocket-log-viewer", [])
     return {
         restrict: 'E',
         replace: true,
-        template: '<div class="log-viewer"><div class="log-viewer-entry" ng-repeat="logline in loglines"><span class="log-viewer-server-color" ng-style="{ backgroundColor: logline.color}"></span><span ng-bind-html="logline.Line"></span></div></div>',
+        template: '<div class="log-viewer"><div class="log-viewer-entry" ng-repeat="logline in loglines"><span class="log-viewer-server-color" ng-style="{ backgroundColor: logline.color}"></span><span ng-bind-html="logline.HtmlLine"></span></div></div>',
         controller: 'websocketLogViewerController'
     };
 })
