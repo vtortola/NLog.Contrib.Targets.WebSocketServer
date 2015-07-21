@@ -59,7 +59,7 @@ namespace NLog.Targets.WebSocketServer
                 return;
             try
             {
-                _distributor.Publish(this.Layout.Render(logEvent), logEvent.TimeStamp);
+                _distributor.Broadcast(this.Layout.Render(logEvent), logEvent.TimeStamp);
             }
             catch
             {

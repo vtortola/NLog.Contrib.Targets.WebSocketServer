@@ -8,7 +8,12 @@ using vtortola.WebSockets;
 
 namespace NLog.Targets.WebSocketServer
 {
-    internal sealed class WebSocketWrapper
+    public interface IWebSocketWrapper
+    {
+        WebSocket WebSocket { get; }
+        Regex Expression { get; set; }
+    }
+    public sealed class WebSocketWrapper : IWebSocketWrapper
     {
         public WebSocket WebSocket { get; private set; }
         public Regex Expression { get; set; }

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NLog.Targets.WebSocketServer.CommandHandlers;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -27,6 +28,8 @@ namespace NLog.Targets.WebSocketServer
         readonly String _ipAddressStart;
         readonly Int32 _maxConnectedClients;
 
+        readonly ICommandHandler[] _commandHandlers;
+
         Int32 _disposed;
 
         public LogEntryDistributor(Int32 port, String ipAddressStart, Int32 maxConnectedClients, TimeSpan clientTimeout)
@@ -43,6 +46,9 @@ namespace NLog.Targets.WebSocketServer
             _connections = new List<WebSocketWrapper>();
             _serializer = new JsonSerializer();
             _semaphore = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+
+            _commandHandlers = new[] { new FilterCommandHandler() };
+
             _listener.Start();
             Task.Run((Func<Task>)AcceptConnections);
             Task.Run((Func<Task>)ReceiveAndBroadcast);
@@ -60,15 +66,13 @@ namespace NLog.Targets.WebSocketServer
                     continue;
                 }
 
-                AddWebSocketToPool(con);
+                if (!TryAddWebSocketToPool(con))
+                    DisconnectWebSocket(con);
             }
         }
 
         private bool CanAcceptConnection(WebSocket con)
         {
-            if (_connections.Count >= _maxConnectedClients)
-                return false;
-
             if (String.IsNullOrEmpty(_ipAddressStart))
                 return true;
 
@@ -78,20 +82,24 @@ namespace NLog.Targets.WebSocketServer
             return con.RemoteEndpoint.Address.ToString().StartsWith(_ipAddressStart);
         }
 
-        private void AddWebSocketToPool(WebSocket con)
+        private Boolean TryAddWebSocketToPool(WebSocket con)
         {
-            var ws = new WebSocketWrapper(con);
             try
             {
                 _semaphore.EnterWriteLock();
+
+                if (_connections.Count >= _maxConnectedClients)
+                   return false;
+
+                var ws = new WebSocketWrapper(con);
                 _connections.Add(ws);
+                Task.Run(() => AcceptWebSocketCommands(ws));
+                return true;
             }
             finally
             {
                 _semaphore.ExitWriteLock();
-            }
-
-            Task.Run(() => AcceptWebSocketCommands(ws));
+            } 
         }
 
         private static void DisconnectWebSocket(WebSocket con)
@@ -114,7 +122,7 @@ namespace NLog.Targets.WebSocketServer
             return Int64.Parse(dateTime.ToString("yyyyMMddHHmmssff"));
         }
 
-        public void Publish(String logline, DateTime timestamp)
+        public void Broadcast(String logline, DateTime timestamp)
         {
             if (_listener.IsStarted && !_cancel.IsCancellationRequested)
             {
@@ -177,6 +185,7 @@ namespace NLog.Targets.WebSocketServer
 
                     var json = JObject.Parse(message);
                     var command = json.Property("command");
+
                     if (command == null || command.Value == null)
                         continue;
 
@@ -193,14 +202,9 @@ namespace NLog.Targets.WebSocketServer
         {
             try
             {
-                switch (commandName)
+                foreach (var handler in _commandHandlers.Where(h=> h.CanHandle(commandName)))
                 {
-                    case "filter":
-                        var expression = json.Property("filter");
-                        if (expression == null || expression.Value == null)
-                            return;
-                        wsWrapper.Expression = new Regex(expression.Value.ToString());
-                        break;
+                    handler.Handle(json, wsWrapper);
                 }
             }
             catch { }

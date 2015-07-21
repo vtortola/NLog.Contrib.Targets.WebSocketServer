@@ -60,6 +60,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandHandlers\FilterCommandHandler.cs" />
+    <Compile Include="CommandHandlers\_ICommandHandler.cs" />
     <Compile Include="LogEntryDistributor.cs" />
     <Compile Include="WebSocketWrapper.cs" />
     <Compile Include="LogEntry.cs" />
