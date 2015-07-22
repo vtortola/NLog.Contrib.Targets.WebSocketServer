@@ -33,7 +33,7 @@
     };
 
     $scope.$on(websocketLogConstants.events.highlighted, function (event, args) {
-        console.log(args);
+        //console.log(args);
     });
 
     setTimeout(function () {

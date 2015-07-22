@@ -66,46 +66,88 @@ angular.module("ng-websocket-log-viewer", [])
     };
 }])
     
-.controller('websocketLogViewerController', ['$scope', 'websocketLogConstants', 'websocketLogEntryFormatterFactory', function ($scope, websocketLogConstants, websocketLogEntryFormatterFactory) {
+.factory('websocketLogConnectionManagerFactory', ['websocketLogConstants', function (websocketLogConstants) {
+    return function (showMessage, saveEntry, $scope) {
+        var me = {};
+        var servers = [];
+
+        var connectionRetry = function (parameters, retry) {
+
+            var willRetryIn = 0;
+            if (retry > 10) {
+                showMessage("Retried connection to '" + parameters.url + "' 10 times. Giving up.", parameters.color);
+            } else {
+                retry++;
+                var seconds = 5 * retry;
+
+                setTimeout(function () {
+                    me.connect(parameters, retry);
+                }, seconds * 1000);
+                willRetryIn = seconds;
+                showMessage("Disconnected from '" + parameters.url + "' " + retry + " times, retrying again in " + seconds + " seconds.", parameters.color);
+            }
+            $scope.$emit(websocketLogConstants.events.disconnected, { url: parameters.url, color: parameters.color, willRetry: !!willRetryIn, willRetryIn: willRetryIn });
+        };
+
+        me.connect = function (parameters, retry) {
+
+            var ws = new WebSocket(parameters.url);
+            showMessage("Connecting to '" + parameters.url + "' ...", parameters.color);
+            ws.onmessage = function (msg) {
+
+                var entry = JSON.parse(msg.data);
+                entry.color = parameters.color;
+                entry.source = parameters.url;
+                saveEntry(entry);
+                lastTimespan = entry.Timestamp;
+            };
+            
+            ws.onopen = function () {
+                servers.push(ws);
+                showMessage("Connected to '" + parameters.url + "'.", parameters.color);
+                if ($scope.filterExpression) {
+                    sendFilter(ws, $scope.filterExpression);
+                }
+                $scope.$emit(websocketLogConstants.events.connected, { url: parameters.url, color: parameters.color });
+            };
+
+            ws.onclose = function () {
+                connectionRetry(parameters, retry);
+            };
+
+            ws.onerror = function () {
+                showMessage("Error on '" + parameters.url + "' connection.", parameters.color);
+            };
+        };
+
+        var sendFilter = function (server, expression) {
+            server.send(JSON.stringify({
+                command: "filter",
+                filter: expression
+            }));
+        };
+
+        me.filter = function (params) {
+            servers.forEach(function (server) {
+                sendFilter(server, params.expression);
+            });
+        };
+
+        return me;
+    };
+}])
+
+.controller('websocketLogViewerController', ['$scope', 'websocketLogConstants', 'websocketLogEntryFormatterFactory', 'websocketLogConnectionManagerFactory',
+    function ($scope, websocketLogConstants, websocketLogEntryFormatterFactory, websocketLogConnectionManagerFactory) {
 
     $scope.loglines = [];
-    var servers = [];
+    
     var maxLines = 50;
     var lastTimespan = 0;
     
     var paused = false;
     var cache = [];
     var lineIdCounter = 0;
-
-    var websocketLogEntryFormatter = websocketLogEntryFormatterFactory($scope);
-
-    $scope.$on(websocketLogConstants.commands.connect, function (event, args) {
-        connect(args, 0);
-    });
-        
-    $scope.$on(websocketLogConstants.commands.filter, function (event, args) {
-        servers.forEach(function (server) {
-            sendFilter(server, args.expression);
-        });
-    });
-
-    $scope.$on(websocketLogConstants.commands.highlight, function (event, args) {
-        websocketLogEntryFormatter.highlight(args);
-    });
-    
-    $scope.$on(websocketLogConstants.commands.lineCount, function (event, args) {
-        var count = Number(args.count);
-        if (!isNaN(count))
-            maxLines = count;
-    });
-
-    $scope.$on(websocketLogConstants.commands.pause, function (event) {
-        pause();
-    });
-
-    $scope.$on(websocketLogConstants.commands.onlyShow, function (event, args) {
-        // todo
-    });
 
     var pause = function () {
         if (paused) {
@@ -136,38 +178,9 @@ angular.module("ng-websocket-log-viewer", [])
         }
         websocketLogEntryFormatter.formatEntry(entry);
         $scope.loglines.push(entry);
+        console.log(entry);
+        lastTimespan = entry.Timestamp;
         updateLogBoard();
-    };
-
-    var connect = function (parameters, retry) {
- 
-        var ws = new WebSocket(parameters.url);
-        showMessage("Connecting to '" + parameters.url + "' ...", parameters.color);
-        ws.onmessage = function (msg) {
-
-            var entry = JSON.parse(msg.data);
-            entry.color = parameters.color;
-            entry.source = parameters.url;
-            saveEntry(entry);
-            lastTimespan = entry.Timestamp;
-        }
-        servers.push(ws);
-
-        ws.onopen = function () {
-            showMessage("Connected to '" + parameters.url + "'.", parameters.color);
-            if ($scope.filterExpression) {
-                sendFilter(ws, $scope.filterExpression);
-            }
-            $scope.$emit(websocketLogConstants.events.connected, { url: parameters.url, color: parameters.color });
-        };
-
-        ws.onclose = function () {
-            connectionRetry(parameters, retry);
-        };
-
-        ws.onerror = function () {   
-            showMessage("Error on '" + parameters.url + "' connection.", parameters.color);
-        };
     };
 
     var updateLogBoard = function () {
@@ -180,36 +193,12 @@ angular.module("ng-websocket-log-viewer", [])
     };
 
     var showMessage = function (line, color) {
+        lastTimespan = lastTimespan + 1;
         pushEntryIntoScope({
-            Timestamp: lastTimespan++,
+            Timestamp: lastTimespan,
             Line: line,
             color: color
         });
-    };
-
-    var connectionRetry = function (parameters, retry) {
-
-        var willRetryIn = 0;
-        if (retry > 10) {
-            showMessage("Retried connection to '" + parameters.url + "' 10 times. Giving up.", parameters.color);
-        } else {
-            retry++;
-            var seconds = 5 * retry;
-
-            setTimeout(function () {
-                connect(parameters, retry);
-            }, seconds * 1000);
-            willRetryIn = seconds;
-            showMessage("Disconnected from '" + parameters.url + "' " + retry + " times, retrying again in " + seconds + " seconds.", parameters.color);
-        }
-        $scope.$emit(websocketLogConstants.events.disconnected, { url: parameters.url, color: parameters.color, willRetry: !!willRetryIn, willRetryIn: willRetryIn });
-    };
-
-    var sendFilter = function (server, expression) {
-        server.send(JSON.stringify({
-            command: "filter",
-            filter: expression
-        }));
     };
 
     var logsorter = function (a, b) {
@@ -220,6 +209,36 @@ angular.module("ng-websocket-log-viewer", [])
         else
             return 0;
     };
+
+    var websocketLogEntryFormatter = websocketLogEntryFormatterFactory($scope);
+    var websocketLogConnectionManager = websocketLogConnectionManagerFactory(showMessage, saveEntry, $scope);
+
+    $scope.$on(websocketLogConstants.commands.connect, function (event, args) {
+        websocketLogConnectionManager.connect(args, 0);
+    });
+
+    $scope.$on(websocketLogConstants.commands.filter, function (event, args) {
+        websocketLogConnectionManager.filter(args);
+    });
+
+    $scope.$on(websocketLogConstants.commands.highlight, function (event, args) {
+        websocketLogEntryFormatter.highlight(args);
+    });
+
+    $scope.$on(websocketLogConstants.commands.lineCount, function (event, args) {
+        var count = Number(args.count);
+        if (!isNaN(count))
+            maxLines = count;
+    });
+
+    $scope.$on(websocketLogConstants.commands.pause, function (event) {
+        pause();
+    });
+
+    $scope.$on(websocketLogConstants.commands.onlyShow, function (event, args) {
+        // todo
+    });
+
 }])
 
 .directive('websocketLogViewer', function () {
