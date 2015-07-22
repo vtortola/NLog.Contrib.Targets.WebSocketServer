@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace NLog.Targets.WebSocketServer.CommandHandlers
+namespace NLog.Contrib.Targets.WebSocketServer.CommandHandlers
 {
     public sealed class FilterCommandHandler : ICommandHandler
     {

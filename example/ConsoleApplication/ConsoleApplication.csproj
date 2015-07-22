@@ -71,9 +71,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\NLog.Targets.WebSocketServer\NLog.Targets.WebSocketServer.csproj">
+    <ProjectReference Include="..\..\NLog.Contrib.Targets.WebSocketServer\NLog.Contrib.Targets.WebSocketServer.csproj">
       <Project>{8ca5d50a-cac7-4fb0-b811-2a1a0df6acdf}</Project>
-      <Name>NLog.Targets.WebSocketServer</Name>
+      <Name>NLog.Contrib.Targets.WebSocketServer</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

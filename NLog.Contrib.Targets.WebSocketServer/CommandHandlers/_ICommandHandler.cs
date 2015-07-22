@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NLog.Targets.WebSocketServer.CommandHandlers
+namespace NLog.Contrib.Targets.WebSocketServer.CommandHandlers
 {
     public interface ICommandHandler
     {

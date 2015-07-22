@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NLog.Targets.WebSocketServer
+namespace NLog.Contrib.Targets.WebSocketServer
 {
     internal sealed class LogEntry
     {

@@ -1,13 +1,14 @@
 ﻿using NLog.Config;
+using NLog.Targets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NLog.Targets.WebSocketServer
+namespace NLog.Contrib.Targets.WebSocketServer
 {
-    [Target("NLog.Targets.WebSocketServer")]
+    [Target("NLog.Contrib.Targets.WebSocketServer")]
     public sealed class WebSocketServerTarget : TargetWithLayout
     {
         LogEntryDistributor _distributor;

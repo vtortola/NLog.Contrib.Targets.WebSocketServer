@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using vtortola.WebSockets;
 
-namespace NLog.Targets.WebSocketServer
+namespace NLog.Contrib.Targets.WebSocketServer
 {
     public interface IWebSocketWrapper
     {

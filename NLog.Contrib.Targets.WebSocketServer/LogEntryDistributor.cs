@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NLog.Targets.WebSocketServer.CommandHandlers;
+using NLog.Contrib.Targets.WebSocketServer.CommandHandlers;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using vtortola.WebSockets;
 
-namespace NLog.Targets.WebSocketServer
+namespace NLog.Contrib.Targets.WebSocketServer
 {
 
     public sealed class LogEntryDistributor : IDisposable
