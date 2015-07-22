@@ -1,6 +1,6 @@
 # NLog.Targets.WebSocketServer
 
-Allows to broadcast your servers´ logs to websocket connections in real-time with minimal effort. Subscribe to a regular expressions to remove undesired lines. Simplifies log monitoring, allowing that a simple web browser to watch over multiple servers´ logs interpolating the lines by timestamp. Not a replacement of a proper monitoring tool, but handy for watching over logs with little logistic effort.
+Broadcast your servers´ logs to websocket connections in real-time with minimal effort. Subscribe to a regular expressions to remove undesired lines. Simplifies log monitoring, allowing that a simple web browser to watch over multiple servers´ logs interpolating the lines by timestamp. Not a replacement of a proper monitoring tool, but handy for watching over logs with little logistic effort.
 
 NLog.Targets.WebSocketServer is a [NLog target](https://github.com/nlog/nlog/wiki/Targets) that instead of writing on a file, or showing the log on the console, broadcast the log entries to the connected websocket connections.
 
@@ -17,16 +17,8 @@ Checkout this example of a log viewer done in AngularJS.
 
 ### NuGet
 ```
-comming soon...
+PM> Install-Package NLog.Contrib.Targets.WebSocketServer
 ```
-
-### Manually
-Just drop the following libraries in your bin folder:
- * NLog.Targets.WebsocketServer
- * vtortola.WebSocketListener
- * vtortola.WebSocketListener.Rfc6455
- * Newtonsoft.Json
- * System.Threading.Tasks.Dataflow
 
 ## Configuration
 Configure `NLog.Targets.WebsocketServer` as a new target.
@@ -36,16 +28,14 @@ Configure `NLog.Targets.WebsocketServer` as a new target.
 #### Optional configuation parameters:
  * `IPAddressStartsWith (String)`: Indicates how the client IP address must start to be accepted. Loopback interface is always accepted. A example value would be `192.168.`. An empty string means that all connections are accepted.
  * `ThrowExceptionIfSetupFails (Boolean)`: By default `NLog.Targets.WebSocketServerTarget` will fail silently if does not succeed trying to set up the websocket server (e.g.: because the port is already in use), and it will be automatically disabled. In production you may not want the application to crash because one of your targets failed, but during development you would like to get an exception indicatig the issue. 
- 
  * `MaxConnectedClients (Int32)`: The maximum number of allowed connections. By default 100.
  * `ClientTimeOut (TimeSpan)`: The amount of time without client [pong responses](https://tools.ietf.org/html/rfc6455#section-5.5.2). By default 10 seconds.
- * `MaximunConnectionLength (TimeSpan)`: The amount of time that a client can be connected. The server will issue a special application closing message that the client must understand as "I am disconnecting you, please do not retry". This is to cover the case were somebody leaves the client application opened by mistake. Default is 6 hours. Zero would mean "no limit".
 
 ```xml
   <nlog>
     <!-- This part is only required for NLog versions < 4.0  -->
     <extensions>
-      <add assembly="NLog.Targets.WebsocketServer"/>
+      <add assembly="NLog.Contrib.Targets.WebsocketServer"/>
     </extensions>
     
     <targets>
@@ -53,7 +43,7 @@ Configure `NLog.Targets.WebsocketServer` as a new target.
       <target name="logfile" type="File" fileName="file.txt" />
       
       <!-- Configuration for NLog.Targets.WebSocketServer -->
-      <target name="websocket" type="WebSocket" port="9001"/>
+      <target name="websocket" type="NLog.Contrib.Targets.WebsocketServer" port="9001"/>
     </targets>
     <rules>
       <logger name="*" minlevel="Trace" writeTo="logfile, websocket, consolelog" />
