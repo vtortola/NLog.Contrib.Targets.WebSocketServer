@@ -1,3 +1,9 @@
+/* ng-websocket-log-viewer 1.0.0
+ * ------------------------------------
+ * This is an AngularJS component to watch logs in real-time using (but not limited to) NLog.Contrib.Targets.WebSocketServer
+ * Please visit: https://github.com/vtortola/NLog.Contrib.Targets.WebSocketServer
+ */
+
 angular.module("ng-websocket-log-viewer", [])
 
 .factory('websocketLogConstants', function () {
@@ -76,15 +82,17 @@ angular.module("ng-websocket-log-viewer", [])
             var willRetryIn = 0;
             if (retry > 10) {
                 showMessage("Retried connection to '" + parameters.url + "' 10 times. Giving up.", parameters.color);
-            } else {
-                retry++;
+            }
+            else {
                 var seconds = 5 * retry;
+                showMessage("Disconnected from '" + parameters.url + "' " + retry + " times, retrying again in " + seconds + " seconds.", parameters.color);
+
+                retry++;
 
                 setTimeout(function () {
                     me.connect(parameters, retry);
                 }, seconds * 1000);
                 willRetryIn = seconds;
-                showMessage("Disconnected from '" + parameters.url + "' " + retry + " times, retrying again in " + seconds + " seconds.", parameters.color);
             }
             $scope.$emit(websocketLogConstants.events.disconnected, { url: parameters.url, color: parameters.color, willRetry: !!willRetryIn, willRetryIn: willRetryIn });
         };
@@ -214,7 +222,7 @@ angular.module("ng-websocket-log-viewer", [])
     var websocketLogConnectionManager = websocketLogConnectionManagerFactory(showMessage, saveEntry, $scope);
 
     $scope.$on(websocketLogConstants.commands.connect, function (event, args) {
-        websocketLogConnectionManager.connect(args, 0);
+        websocketLogConnectionManager.connect(args, 1);
     });
 
     $scope.$on(websocketLogConstants.commands.filter, function (event, args) {
