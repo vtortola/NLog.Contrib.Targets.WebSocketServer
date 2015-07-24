@@ -11,7 +11,7 @@ Features:
  * **Subscribe to Regular Expressions**: Is it possible to send a message throug the WebSocket connection to indicate the expression to which you want to subscribe. Only log entries matching that regex will be sent.
  * **Scalable**: NLog and WebSocketListener components are decoupled by a [producer-consumer pattern](http://www.ni.com/white-paper/3023/en/), so NLog will append the log entries to `WebSocketServerTarget` in `O(1)` time always, and another thread/threads are responsible of distributing that log entry to the clients. Still, if the component has a big number of connected clients, it may interfere with your application performance. See the `MaxConnectedClients` configuration setting.
  
-Checkout this example of a log viewer done in AngularJS. 
+[Checkout this example of a log viewer done in AngularJS](//github.com/vtortola/NLog.Contrib.Targets.WebSocketServer/wiki/Low-viewer-UI-example-with-AngularJS). 
 
 ## Installation
 
