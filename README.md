@@ -12,8 +12,8 @@ Features:
  * **Scalable**: NLog and WebSocketListener components are decoupled by a [producer-consumer pattern](http://www.ni.com/white-paper/3023/en/), so NLog will append the log entries to `WebSocketServerTarget` in `O(1)` time always, and another thread/threads are responsible of distributing that log entry to the clients. Still, if the component has a big number of connected clients, it may interfere with your application performance. See the `MaxConnectedClients` configuration setting.
  
 [Checkout this example of a log viewer done in AngularJS](//github.com/vtortola/NLog.Contrib.Targets.WebSocketServer/wiki/Low-viewer-UI-example-with-AngularJS). 
-Inline-style: 
-![AngularJS Log viewer](//vtortola.github.io/NLog.Contrib.Targets.WebSocketServer/screenshot.png "Log Viewer in AngularJS")
+
+![AngularJS Log viewer](http://vtortola.github.io/NLog.Contrib.Targets.WebSocketServer/screenshot.png)
 
 ## Installation
 
