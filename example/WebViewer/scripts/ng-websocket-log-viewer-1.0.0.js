@@ -186,7 +186,6 @@ angular.module("ng-websocket-log-viewer", [])
         }
         websocketLogEntryFormatter.formatEntry(entry);
         $scope.loglines.push(entry);
-        console.log(entry);
         lastTimespan = entry.Timestamp;
         updateLogBoard();
     };
