@@ -1,8 +1,8 @@
-# NLog.Targets.WebSocketServer
+# NLog.Contrib.Targets.WebSocketServer
 
 Broadcast your servers´ logs to websocket connections in real-time with minimal effort. Subscribe to a regular expressions to remove undesired lines. Simplifies log monitoring, allowing that a simple web browser to watch over multiple servers´ logs interpolating the lines by timestamp. Not a replacement of a proper monitoring tool, but handy for watching over logs with little logistic effort.
 
-NLog.Targets.WebSocketServer is a [NLog target](https://github.com/nlog/nlog/wiki/Targets) that instead of writing on a file, or showing the log on the console, broadcast the log entries to the connected websocket connections.
+NLog.Contrib.Targets.WebSocketServer is a [NLog target](https://github.com/nlog/nlog/wiki/Targets) that instead of writing on a file, or showing the log on the console, broadcast the log entries to the connected websocket connections.
 
 Features:
  * **Fully integrated with NLog**: it does not require changes in your application code beyond the configuration.
