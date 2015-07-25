@@ -55,7 +55,7 @@
 <h2>
 <a id="configuration" class="anchor" href="#configuration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuration</h2>
 
-<p>Configure <code>NLog.Targets.WebsocketServer</code> as a new target.</p>
+<p>Configure <code>NLog.Contrib.Targets.WebsocketServer</code> as a new target.</p>
 
 <h4>
 <a id="required-configuration-parameters" class="anchor" href="#required-configuration-parameters" aria-hidden="true"><span class="octicon octicon-link"></span></a>Required configuration parameters:</h4>
@@ -72,7 +72,7 @@
 <li>
 <code>IPAddressStartsWith (String)</code>: Indicates how the client IP address must start to be accepted. Loopback interface is always accepted. A example value would be <code>192.168.</code>. An empty string means that all connections are accepted.</li>
 <li>
-<code>ThrowExceptionIfSetupFails (Boolean)</code>: By default <code>NLog.Targets.WebSocketServerTarget</code> will fail silently if does not succeed trying to set up the websocket server (e.g.: because the port is already in use), and it will be automatically disabled. In production you may not want the application to crash because one of your targets failed, but during development you would like to get an exception indicatig the issue. </li>
+<code>ThrowExceptionIfSetupFails (Boolean)</code>: By default <code>NLog.Contrib.Targets.WebSocketServerTarget</code> will fail silently if does not succeed trying to set up the websocket server (e.g.: because the port is already in use), and it will be automatically disabled. In production you may not want the application to crash because one of your targets failed, but during development you would like to get an exception indicatig the issue. </li>
 <li>
 <code>MaxConnectedClients (Int32)</code>: The maximum number of allowed connections. By default 100.</li>
 <li>
