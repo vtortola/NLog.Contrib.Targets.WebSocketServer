@@ -44,7 +44,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NLog.Contrib.Targets.WebSocketServer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NLog.Contrib.Targets.WebSocketServer.0.0.1\lib\net451\NLog.Contrib.Targets.WebSocketServer.dll</HintPath>
+      <HintPath>..\..\packages\NLog.Contrib.Targets.WebSocketServer.1.0.0\lib\net451\NLog.Contrib.Targets.WebSocketServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -58,16 +58,16 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="vtortola.WebSockets, Version=2.1.7.0, Culture=neutral, PublicKeyToken=7f78616efb4a208d, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\vtortola.WebSocketListener.2.1.7.0\lib\net45\vtortola.WebSockets.dll</HintPath>
+    <Reference Include="vtortola.WebSockets, Version=2.1.8.0, Culture=neutral, PublicKeyToken=7f78616efb4a208d, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\vtortola.WebSocketListener.2.1.8.0\lib\net45\vtortola.WebSockets.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="vtortola.WebSockets.Deflate, Version=2.1.7.0, Culture=neutral, PublicKeyToken=7f78616efb4a208d, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\vtortola.WebSocketListener.2.1.7.0\lib\net45\vtortola.WebSockets.Deflate.dll</HintPath>
+    <Reference Include="vtortola.WebSockets.Deflate, Version=2.1.8.0, Culture=neutral, PublicKeyToken=7f78616efb4a208d, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\vtortola.WebSocketListener.2.1.8.0\lib\net45\vtortola.WebSockets.Deflate.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="vtortola.WebSockets.Rfc6455, Version=2.1.7.0, Culture=neutral, PublicKeyToken=7f78616efb4a208d, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\vtortola.WebSocketListener.2.1.7.0\lib\net45\vtortola.WebSockets.Rfc6455.dll</HintPath>
+    <Reference Include="vtortola.WebSockets.Rfc6455, Version=2.1.8.0, Culture=neutral, PublicKeyToken=7f78616efb4a208d, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\vtortola.WebSocketListener.2.1.8.0\lib\net45\vtortola.WebSockets.Rfc6455.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
