@@ -23,13 +23,13 @@ PM> Install-Package NLog.Contrib.Targets.WebSocketServer
 ```
 
 ## Configuration
-Configure `NLog.Targets.WebsocketServer` as a new target.
+Configure `NLog.Contrib.Targets.WebsocketServer` as a new target.
 #### Required configuration parameters:
  * `Port (Int32)` : Indicates in which connection will the WebSocket server listen for new connections.
 
 #### Optional configuation parameters:
  * `IPAddressStartsWith (String)`: Indicates how the client IP address must start to be accepted. Loopback interface is always accepted. A example value would be `192.168.`. An empty string means that all connections are accepted.
- * `ThrowExceptionIfSetupFails (Boolean)`: By default `NLog.Targets.WebSocketServerTarget` will fail silently if does not succeed trying to set up the websocket server (e.g.: because the port is already in use), and it will be automatically disabled. In production you may not want the application to crash because one of your targets failed, but during development you would like to get an exception indicatig the issue. 
+ * `ThrowExceptionIfSetupFails (Boolean)`: By default `NLog.Contrib.Targets.WebSocketServerTarget` will fail silently if does not succeed trying to set up the websocket server (e.g.: because the port is already in use), and it will be automatically disabled. In production you may not want the application to crash because one of your targets failed, but during development you would like to get an exception indicatig the issue. 
  * `MaxConnectedClients (Int32)`: The maximum number of allowed connections. By default 100.
  * `ClientTimeOut (TimeSpan)`: The amount of time without client [pong responses](https://tools.ietf.org/html/rfc6455#section-5.5.2). By default 10 seconds.
 
