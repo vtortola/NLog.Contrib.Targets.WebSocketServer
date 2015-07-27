@@ -19,7 +19,7 @@ Features:
 
 ### NuGet
 
-This component is available through [NuGet](https://www.nuget.org/packages/NLog.Contrib.Targets.WebSocketServer/).
+[NLog.Contrib.Targets.WebSocketServer is available in NuGet](https://www.nuget.org/packages/NLog.Contrib.Targets.WebSocketServer/).
 ```
 PM> Install-Package NLog.Contrib.Targets.WebSocketServer
 ```
